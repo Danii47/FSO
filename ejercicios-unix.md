@@ -340,3 +340,25 @@ $ cat -n /etc/netconfig
     19  unix       tpi_cots_ord  -     loopback  -      -       -
 ```
 > El comando `cat` tiene una opción `-n` que permite mostrar el número de cada línea.
+
+
+## Ejercicio 15
+Se llama **extensión** de un **fichero** a la **cadena de caracteres** que aparece **tras** el caracter `.` al final del nombre. Por ejemplo, el fichero `programa.c` tiene extensión `c` (que significa que **contiene** los **fuentes** de un programa en **lenguaje C**) y en el fichero `ejemplo.txt` la extensión es `txt`. **Liste** en **formato corto** (sólo nombres) el contenido del directorio `/etc`, de manera que la **salida** aparezca en **una columna** y **ordenada por la extensión**. Para ello, consulte las opciones del comando `ls`.
+
+```bash
+# SOLO CON LS USANDO LA OPCION -X
+$ ls -1X /etc
+...
+updatedb.conf
+vconsole.conf
+xattr.conf
+manpath.config
+apparmor.d
+bash_completion.d
+binfmt.d
+cgconfig.d
+...
+```
+> El comando `ls` tiene una opción `-X` que permite ordenar los ficheros por extensión.
+>
+> La opción `-1` de `ls` permite mostrar los ficheros en una sola columna.
