@@ -17,7 +17,7 @@ Para acceder a un sistema UNIX, se puede hacer de dos formas:
 1. **Localmente**: A través de una terminal.
 2. **Remotamente**: A través de una conexión de red con el protocolo **SSH**.
 
-> [!TIP] Util
+> [!TIP]
 > La tecla tabulador permite autocompletar comandos y nombres de ficheros.
 > 
 > ---
@@ -27,14 +27,14 @@ Para acceder a un sistema UNIX, se puede hacer de dos formas:
 ## 3. Ficheros y directorios
 Tamibén conocidos como **archivos** y **carpetas**, contienen información y se organizan en una **estructura de árbol** con un nombre único.
 
-> [!WARNING] Cuidado
+> [!WARNING]
 > Los nombres de ficheros y directorios son **case sensitive** (distinguen entre mayúsculas y minúsculas).
 >
 > ---
 >
 > Los caracteres pueden ser cualquiera menos los siguientes que tienen un significado especial: `*`, `?`, `[`, `]`, `’`, `’’`, `` ` ``, `^`, `|`, cualquier car´acter ASCII inferior al 32 y superior al 127
 
-> [!TIP] Util
+> [!TIP]
 > No existe una regla, pero si convenciones normalmente aceptadas, para nombrar ficheros y directorios. Por ejemplo, los ficheros de texto suelen tener la extensión `.txt` y los ficheros Python `.py`.
 >
 > ---
@@ -44,14 +44,14 @@ Tamibén conocidos como **archivos** y **carpetas**, contienen información y se
 ## 4. Organización de ficheros y directorios
 El sistema de ficheros de UNIX se organiza en una **estructura de árbol** con un **directorio raíz** `/` y varios **subdirectorios**.
 
-> [!TIP] Util
+> [!TIP]
 > Relación **padre-hijo**: Un directorio puede contener otros directorios y ficheros, a los que se llama **hijos**. A su vez, un directorio puede ser contenido por otro directorio, al que se llama **padre**.
 
 El directorio actual o de trabajo es el directorio en el que se encuentra el usuario en un momento dado. Se le conoce con el nombre `.` y el directorio padre con el nombre `..`.
 
 El directorio `HOME` es el directorio personal del usuario, que se representa con el carácter `~` (virgulilla). Al iniciar sesión, el usuario se sitúa en su directorio `HOME` y es donde puede gestionar sus ficheros y directorios.
 
-> [!TIP] Util
+> [!TIP]
 > Los ficheros pueden ser especificados de dos formas:
 > - **Ruta absoluta**: Se especifica desde el directorio raíz `/`.
 > - **Ruta relativa**: Se especifica desde el directorio actual.
@@ -425,7 +425,7 @@ Los comandos en UNIX pueden recibir **entrada** y producir **salida**.
 **Salida de errores de un comando**: Forma en la que se muestran los errores de un comando.
 - **Salida de errores estándar**: Se muestra en la pantalla (terminal).
 
-> [!WARNING] Cuidado
+> [!WARNING]
 > No todos los **comandos** tienen **entrada** y/o **salida**.
 >
 > ---
