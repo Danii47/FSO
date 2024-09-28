@@ -188,3 +188,70 @@ $ ls -l
 > La parte del listado largo del directorio `HOME` que ha cambiado es el número de links de los ficheros `mipasswd` y `ejemplo2.txt`, que ha pasado de 2 a 1.
 
 
+## Ejercicio 8
+**a)** Cambie de nombre al fichero `mipasswd` creado en el **ejercicio 5**, y llámelo `texto.txt`. Haga una copia de esta fichero y llámela `texto_cop.txt`.
+
+```bash
+$ cd # Nos movemos a nuestro directorio "HOME"
+$ mv mipasswd texto.txt # Cambiamos el nombre del fichero mipasswd a texto.txt
+$ cp texto.txt texto_cop.txt # Copiamos el fichero texto.txt a texto_cop.txt
+```
+
+**b)** Modifique los **permisos** del fichero `texto.txt` de manera que se **elimine** el **permiso de escritura** para el **propietario**. Intente **borrar** el fichero. Como está **protegido** contra **escritura**, significa que **no** se puede **modificar**, lo que incluye el **borrado**. Sin embargo, como el fichero es **suyo** le pregunta si quiere **borrarlo** (si no fuera suyo, el sistema **directamente impediría el borrado**). Responda **no** a la pregunta. Bórrelo nuevamente pero usando la opción de forzar el borrado para que no pregunte.
+
+```bash
+$ chmod u-w texto.txt # Eliminamos el permiso de escritura para el propietario
+$ rm texto.txt # Intentamos borrar el fichero
+rm: remove write-protected regular file 'texto.txt'? n # Respondemos no a la pregunta
+$ rm -f texto.txt # Forzamos el borrado del fichero
+```
+
+
+## Ejercicio 9
+**a)** Cambie el nombre al directorio `dir1`, y llámelo `tmp`.
+
+```bash
+$ mv dir1 tmp # Cambiamos el nombre del directorio dir1 a tmp
+```
+
+**b)** Cree un fichero en el directorio `tmp`. ¿Se podría borrar el directorio con el comando rmdir? Bórrelo usando una sola línea de comandos.
+
+```bash
+$ touch tmp/fichero.txt # Creamos un fichero en el directorio tmp
+$ rmdir tmp # Intentamos borrar el directorio tmp
+rmdir: failed to remove 'tmp': Directory not empty # No se puede borrar el directorio porque no está vacío
+$ rm tmp/fichero.txt; rmdir tmp # Borramos el fichero y el directorio en una sola línea de comandos
+# También se puede usar rm -r tmp para borrar el directorio y su contenido
+```
+> El comando `rmdir` solo puede borrar directorios vacíos.
+> 
+> El comando `rm -r` borra el directorio y su contenido.
+
+
+## Ejercicio 10
+Copie a su directorio HOME el fichero `/home/dieggar/tmp/texto_cop.txt`:
+
+```bash
+$ cp /home/dieggar/tmp/texto_cop.txt ~ # Copiamos el fichero texto cop.txt a nuestro directorio "HOME"
+```
+
+**a)** El fichero `/home/dieggar/tmp/texto_cop.txt`, pertenece **originalmente** al usuario
+**dieggar**, ¿quién es el **propietario** y a qué **grupo** ha sido asignada la **copia** realizada?
+
+```bash
+$ ls -l /home/dieggar/tmp/texto_cop.txt
+-rw-r--r-- 1 dieggar dieggar 31 sep 26 10:28 /home/dieggar/tmp/texto_cop.txt
+$ ls -l texto_cop.txt
+-rw-r--r-- 1 12345678A JX 31 sep 26 10:28 texto_cop.txt
+```
+> El nuevo propietario del fichero es el usuario con el nombre de usuario 12345678A y el grupo JX, el usuario que copia el fichero.
+
+**b)** Antes de la operación copia, ya existía en su `HOME`, tras la primera operación indicada en el **ejercicio 8**, un fichero llamado `texto_cop.txt`, ¿qué ha pasado con él tras la copia? ¿Cómo podríamos **proteger** un **fichero** frente a **copias** con el mismo **nombre** realizadas por **error**?
+
+```bash
+$ ls -l texto_cop.txt
+-rw-r--r-- 1 12345678A JX 31 sep 26 10:28 texto_cop.txt
+```
+> El fichero `texto_cop.txt` ha sido **sobrescrito** por la copia realizada.
+> 
+> Para proteger un fichero frente a copias con el mismo nombre realizadas por error, se puede **cambiar el nombre** del fichero **antes** de realizar la **copia**. También **quitar** los **permisos** de **escritura** de nuestro fichero, para **evitar** que se pueda **sobrescribir** por **error**.
