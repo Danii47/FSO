@@ -255,3 +255,88 @@ $ ls -l texto_cop.txt
 > El fichero `texto_cop.txt` ha sido **sobrescrito** por la copia realizada.
 > 
 > Para proteger un fichero frente a copias con el mismo nombre realizadas por error, se puede **cambiar el nombre** del fichero **antes** de realizar la **copia**. También **quitar** los **permisos** de **escritura** de nuestro fichero, para **evitar** que se pueda **sobrescribir** por **error**.
+
+
+## Ejercicio 11
+---
+
+
+## Ejercicio 12
+Vaya al directorio `/sys` y **ejecute** el comando `ls d*` o `ll d*`. Teóricamente todos los elementos listados (**ficheros** o **directorios**) deberían empezar por `d`, pero no es así. ¿Por qué? Busque entre las opciones de `ls` aquella que permita listar del contenido del directorio `/sys`, las entradas correspondientes a sus **subdirectorios** `dev` y `devices`, no su contenido.
+
+```bash
+$ cd /sys
+$ ls -d d*
+devices dev
+```
+> El comando `ls` tiene una opción `-d` que permite listar los directorios sin mostrar su contenido.
+
+
+## Ejercicio 13
+**a)** Cree, mediante una única línea de comandos, tres directorios llamados `dir1`, `dir2` y `dir3` de manera que `dir1` cuelgue del `HOME`, `dir1` sea padre de `dir2` y `dir2` sea padre de `dir3`. Busque la opción.
+
+```bash
+$ mkdir dir1 dir1/dir2 dir1/dir2/dir3
+# Usando la opción -p de mkdir, se pueden crear directorios anidados
+$ mkdir -p dir1/dir2/dir3
+```
+> La opción `-p` de `mkdir` permite crear directorios anidados.
+
+**b)** Sitúe como directorio actual el raíz. Sin moverse de ese directorio, copie el fichero `texto.txt` que está en su `HOME` en el directorio `dir1`.
+
+```bash
+$ cd /
+$ cp ~/texto.txt ~/dir1 # Si no se especifica el nombre del fichero, se copia con el mismo nombre
+```
+
+**c)** Desde `dir1` (hágalo su directorio actual), **mueva** el fichero `texto.txt` que está en el `HOME` al directorio `dir2` con el nombre de `texto_cop_2.txt` usando **rutas relativas**.
+
+```bash
+$ cd ~/dir1
+$ mv ../texto.txt dir2/texto_cop_2.txt # Movemos el fichero texto.txt al directorio dir2 con el nombre texto_cop_2.txt
+```
+> Con `..` se puede acceder al directorio padre.
+
+**d)** Desde `dir3` (hágalo su directorio actual), **mueva** el fichero `texto_cop_2.txt` del directorio `dir2` al directorio actual usando **rutas relativas**.
+
+```bash
+# Estamos en dir1 por el paso anterior
+$ cd dir2/dir3
+$ mv ../texto_cop_2.txt . # Movemos el fichero texto_cop_2.txt al directorio actual
+```
+
+**e)** **Borre**, mediante una **única línea** de comandos, el directorio `dir2` y todo su contenido.
+
+```bash
+$ cd ~/dir1
+$ rm -rf dir2 # Borramos el directorio dir2 y todo su contenido
+```
+> El comando `rm -r` borra el directorio y su contenido, mientras que la opción `-f` evita que se muestren mensajes de confirmación para cada fichero borrado.
+
+
+## Ejercicio 14
+Muestre el contenido del fichero `/etc/netconfig` mostrando el número de cada línea.
+
+```bash
+$ cat -n /etc/netconfig
+     1  #
+     2  # The network configuration file. This file is currently only used in
+     3  # conjunction with the TI-RPC code in the libtirpc library.
+     4  #
+     5  # Entries consist of:
+     6  #
+     7  #       <network_id> <semantics> <flags> <protofamily> <protoname> \
+     8  #               <device> <nametoaddr_libs>
+     9  #
+    10  # The <device> and <nametoaddr_libs> fields are always empty in this
+    11  # implementation.
+    12  #
+    13  udp        tpi_clts      v     inet     udp     -       -
+    14  tcp        tpi_cots_ord  v     inet     tcp     -       -
+    15  udp6       tpi_clts      v     inet6    udp     -       -
+    16  tcp6       tpi_cots_ord  v     inet6    tcp     -       -
+    17  rawip      tpi_raw       -     inet      -      -       -
+    18  local      tpi_cots_ord  -     loopback  -      -       -
+    19  unix       tpi_cots_ord  -     loopback  -      -       -
+```
+> El comando `cat` tiene una opción `-n` que permite mostrar el número de cada línea.
