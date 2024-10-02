@@ -1,4 +1,4 @@
-# EJERCICIOS UNIX
+# EJERCICIOS UNIX 1
 
 ## Ejercicio 1
 Mediante el uso de los comandos cd, ls/ll y pwd, dibuje de forma gráfica similar a como aparece en los apuntes, los siguientes elementos de la estructura de directorios de la máquina:
