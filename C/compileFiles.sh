@@ -1,5 +1,5 @@
-C_DIR="$HOME/C"
-tar_file="$HOME/C.tar.gz"
+C_DIR="$HOME/FSO/C"
+tar_file="$HOME/FSO/C.tar.gz"
 
 # Cambiar a la carpeta C en caso de existir
 cd "$C_DIR" || { echo "No se pudo acceder a la carpeta $C_DIR"; exit 1; }
@@ -35,9 +35,10 @@ for dir in */; do
 done
 
 # Subo los cambios a Git
-git add ../C/
+git add .
 git commit -m "Commit automático de actualización carpeta C de FSO."
 git push origin main
+echo "Cambios subidos automaticamente al repositorio de GitHub."
 
 # Crear un archivo zip de la carpeta actual
 tar -czf "$tar_file" -C "$HOME" "C"
