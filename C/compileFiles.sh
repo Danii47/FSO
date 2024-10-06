@@ -41,5 +41,5 @@ git push origin main
 echo "Cambios subidos automaticamente al repositorio de GitHub."
 
 # Crear un archivo zip de la carpeta actual
-tar -czf "$tar_file" -C "$HOME" "C"
+tar -czf "$tar_file" -C "$HOME" "FSO" "C"
 echo "Creado el comprimido: $tar_file"
