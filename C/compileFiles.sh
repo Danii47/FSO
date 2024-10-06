@@ -1,5 +1,5 @@
 C_DIR="$HOME/FSO/C"
-tar_file="$HOME/FSO/C.tar.gz"
+tar_file="$HOME/C.tar.gz"
 
 # Cambiar a la carpeta C en caso de existir
 cd "$C_DIR" || { echo "No se pudo acceder a la carpeta $C_DIR"; exit 1; }
