@@ -15,17 +15,17 @@ for dir in */; do
             # Compila el archivo
             gcc -o "${number}.out" "$file" 2>/dev/null
 	    if [ $? -ne 0 ]; then
-            	echo "Error al compilar $file. Reintentando con -lm..."
+            	echo -e "\033[1;31mError al compilar $file. Reintentando con -lm...\033[0m"
                 gcc -o "${number}.out" "$file" -lm 2>/dev/null
 
                 # Si vuelve a fallar, muestra un mensaje de error
                 if [ $? -ne 0 ]; then
-                    echo "Error al compilar $file incluso con -lm"
+                    echo -e "\033[1;31mError al compilar $file incluso con -lm\033[0m"
                 else
-                    echo "Compilado el archivo $file con -lm a ${number}.out"
+                    echo -e "\033[1;32mCompilado el archivo $file con -lm a ${number}.out\033[0m"
                 fi
             else
-                echo "Compilado el archivo $file a ${number}.out"
+                echo -e "\033[1;32mCompilado el archivo $file a ${number}.out\033[0m"
             fi
         fi
     done
@@ -35,11 +35,16 @@ for dir in */; do
 done
 
 # Subo los cambios a Git
-git add .
-git commit -m "Commit automático de actualización carpeta C de FSO | $(date +"%Y-%m-%d %H:%M:%S")"
-git push origin main
-echo "Cambios subidos automaticamente al repositorio de GitHub."
+if [[ "$1" == "y" || "$1" == "yes" ]]; then
+    git add .
+    commit_message="Commit automático de actualización carpeta C de FSO | $(date +"%Y-%m-%d %H:%M:%S")"
+    git commit -m "$commit_message"
+    git push origin main
+    echo "\033[36mCambios subidos automaticamente al repositorio de GitHub.\033[0m"
+else
+    echo -e "\033[97mCambios \033[31mNO\033[97m subidos a GitHub.\033[0m"
+fi
 
 # Crear un archivo zip de la carpeta actual
 tar -czf "$tar_file" -C "$HOME/FSO" "C"
-echo "Creado el comprimido: $tar_file"
+echo -e "\033[1;34mCreado el comprimido: $tar_file\033[0m"
