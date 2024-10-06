@@ -34,6 +34,11 @@ for dir in */; do
     cd ..
 done
 
+# Subo los cambios a Git
+git add ../C/
+git commit -m "Commit automático de actualización carpeta C de FSO."
+git push origin main
+
 # Crear un archivo zip de la carpeta actual
 tar -czf "$tar_file" -C "$HOME" "C"
 echo "Creado el comprimido: $tar_file"
