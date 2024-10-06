@@ -39,8 +39,8 @@ if [[ "$1" == "y" || "$1" == "yes" ]]; then
     git add .
     commit_message="Commit automático de actualización carpeta C de FSO | $(date +"%Y-%m-%d %H:%M:%S")"
     git commit -m "$commit_message"
-    git push origin main
-    echo "\033[36mCambios subidos automaticamente al repositorio de GitHub.\033[0m"
+    git push origin main > /dev/null 2>&1
+    echo -e "\033[36mCambios subidos automaticamente al repositorio de GitHub.\033[0m"
 else
     echo -e "\033[97mCambios \033[31mNO\033[97m subidos a GitHub.\033[0m"
 fi
