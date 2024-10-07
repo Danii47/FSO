@@ -50,7 +50,7 @@ $ grep -c "" /etc/passwd
 
 ```bash
 $ cp /etc/passwd ~/passwd
-$ tr [:lower:]' '[:upper:]' < ~/passwd
+$ tr '[:lower:]' '[:upper:]' < ~/passwd
 ```
 > El comando `tr` usando RegExp permite `[:lower:]` para interpretar un patrón de letras minusculas y lo traduce a `[:upper:]`, un patrón que traduce cada letra a su mayuscula.
 
@@ -81,15 +81,15 @@ a) **Indique** cuál o cuáles de las siguientes **líneas** de **comandos** son
 
 **1)**
 ```bash
-$ cat [ruta]fichero | grep cadena caracteres | wc -l
+$ cat [ruta]fichero | grep cadena_caracteres | wc -l
 ```
 **2)**
 ```bash
-$ cat | grep cadena caracteres | wc -l
+$ cat | grep cadena_caracteres | wc -l
 ```
 **3)**
 ```bash
-$ cat < [ruta]fichero | grep cadena caracteres | wc -l
+$ cat < [ruta]fichero | grep cadena_caracteres | wc -l
 ```
 
 > Las líneas 1 y 3 son equivalentes, ya que ambas leen el contenido de un fichero y lo pasan a `grep` para que busque una cadena de caracteres y finalmente `wc -l` cuenta el número de líneas que contienen la cadena de caracteres.
@@ -135,11 +135,11 @@ $ cp [ruta]fichero/s_origen [ruta]fichero/s_destino
 
 **d)**
 ```bash
-$ cat [ruta]fichero/s > [ruta]fichero | grep cadena caracteres
+$ cat [ruta]fichero/s > [ruta]fichero | grep cadena_caracteres
 ```
 > **Incorrecta**. La redirección de salida `>` se está usando en la tubería, lo cual no tiene sentido ya que al grep no le llegará ninguna entrada. La forma correcta sería:
 ```bash
-$ cat [ruta]fichero/s | grep cadena caracteres > [ruta]fichero
+$ cat [ruta]fichero/s | grep cadena_caracteres > [ruta]fichero
 ```
 
 **e)** 
