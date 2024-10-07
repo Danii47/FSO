@@ -16,11 +16,11 @@ typedef struct {
 double arrSum(MyArray *arr) {
   double sum = 0;
 
-  for (int i = 0; i < (*arr).length; i++) {
-    sum += (*arr).values[i];
+  for (int i = 0; i < arr->length; i++) {
+    sum += arr->values[i];
   }
 
-  (*arr).sum = sum;
+  arr->sum = sum;
 }
 
 int main() {
