@@ -63,12 +63,15 @@ int main(int argc, char** argv) {
     FILE* file = fopen(fileName, "wt");
 
     for (int i = 0; i < rowsNumber; i++) {
+      fprintf(file, "(");
       for (int j = 0; j < columnsNumber; j++) {
         printf("Escribe el valor [%i][%i] de la matriz.\n", i, j);
         scanf("%f", &matrix[i * columnsNumber + j]);
-        fprintf(file, "%f ", matrix[i * columnsNumber + j]);
+        fprintf(file, "%f", matrix[i * columnsNumber + j]);
+        if (j != columnsNumber - 1)
+          fprintf(file, "\t");
       }
-      fprintf(file, "\n");
+      fprintf(file, ")\n");
     }
 
     fclose(file);
