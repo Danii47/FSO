@@ -36,28 +36,45 @@ bool isNumber(char* str) {
 }
 
 int main(int argc, char** argv) {
-  if (argc != 4) return 1;
+  if (argc != 4) {
+    fprintf(stderr, "ERROR: El número de argumentos es incorrecto.");
+    exit(-1);
+  }
 
   char* rows = argv[1];
   char* columns = argv[2];
   if (!isNumber(rows) || !isNumber(columns)) {
-    return -1;
+    fprintf(stderr, "ERROR: El número de filas y/o columnas no es correcto.");
+    exit(-1);
   }
 
   int rowsNumber = atoi(rows);
   int columnsNumber = atoi(columns);
 
-  char* fileName = argv[3];
-
-  int matrix[rowsNumber][columnsNumber];
-
-  for (int i = 0; i < rowsNumber; i++) {
-    for (int j = 0; j < columnsNumber; j++) {
-      printf("Escribe el valor [%i][%i] de la matriz.\n", i, j);
-      scanf("%i", (matrix + i)[0] + j); // &matrix[i][j]
-    }
+  if (rowsNumber > 10 || rowsNumber < 1 || columnsNumber > 10 || columnsNumber < 1) {
+    fprintf(stderr, "ERROR:");
+    exit(-1);
   }
-  printf("Matriz guardada en %s!\n", fileName);
 
-  return 0;
+  float* matrix = (float*) malloc(sizeof(float) * (rowsNumber * columnsNumber));
+
+  if (matrix != NULL) {
+    char* fileName = argv[3];
+    FILE* file = fopen(fileName, "wt");
+
+    for (int i = 0; i < rowsNumber; i++) {
+      for (int j = 0; j < columnsNumber; j++) {
+        printf("Escribe el valor [%i][%i] de la matriz.\n", i, j);
+        scanf("%f", &matrix[i * columnsNumber + j]);
+        fprintf(file, "%f ", matrix[i * columnsNumber + j]);
+      }
+      fprintf(file, "\n");
+    }
+
+    fclose(file);
+
+    printf("Matriz guardada en %s!\n", fileName);
+
+    return 0;
+  }
 }
