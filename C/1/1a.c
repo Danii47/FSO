@@ -10,16 +10,19 @@ a) Cálculo de área de un círculo.
 
 #define PI 3.14159265358979323846
 #include <stdio.h>
+#include <string.h>
 
 int main() {
-  double radius;
+  // double radius;
 
-  printf("Este programa le permite calcular el area de un circulo dado su radio.\nIntroduzca el valor del radio: ");
-  scanf("%lf", &radius);
+  // printf("Este programa le permite calcular el area de un circulo dado su radio.\nIntroduzca el valor del radio: ");
+  // scanf("%lf", &radius);
 
-  double area = PI * radius * radius;
+  // double area = PI * radius * radius;
 
-  printf("El valor del area del ciruculo es: %lf\n", area);
+  // printf("El valor del area del ciruculo es: %lf\n", area);
+
+  
 
   return 0;
 }

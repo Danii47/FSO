@@ -37,14 +37,14 @@ bool isNumber(char* str) {
 
 int main(int argc, char** argv) {
   if (argc != 4) {
-    fprintf(stderr, "ERROR: El número de argumentos es incorrecto.");
+    fprintf(stderr, "ERROR: El número de argumentos es incorrecto.\n");
     exit(-1);
   }
 
   char* rows = argv[1];
   char* columns = argv[2];
   if (!isNumber(rows) || !isNumber(columns)) {
-    fprintf(stderr, "ERROR: El número de filas y/o columnas no es correcto.");
+    fprintf(stderr, "ERROR: El número de filas y/o columnas no es correcto.\n");
     exit(-1);
   }
 
@@ -52,32 +52,40 @@ int main(int argc, char** argv) {
   int columnsNumber = atoi(columns);
 
   if (rowsNumber > 10 || rowsNumber < 1 || columnsNumber > 10 || columnsNumber < 1) {
-    fprintf(stderr, "ERROR:");
+    fprintf(stderr, "ERROR: El número de filas / columnas es mayor que 10 o menor que 1.\n");
     exit(-1);
   }
 
   float* matrix = (float*) malloc(sizeof(float) * (rowsNumber * columnsNumber));
 
-  if (matrix != NULL) {
-    char* fileName = argv[3];
-    FILE* file = fopen(fileName, "wt");
-
-    for (int i = 0; i < rowsNumber; i++) {
-      fprintf(file, "(");
-      for (int j = 0; j < columnsNumber; j++) {
-        printf("Escribe el valor [%i][%i] de la matriz.\n", i, j);
-        scanf("%f", &matrix[i * columnsNumber + j]);
-        fprintf(file, "%f", matrix[i * columnsNumber + j]);
-        if (j != columnsNumber - 1)
-          fprintf(file, "\t");
-      }
-      fprintf(file, ")\n");
-    }
-
-    fclose(file);
-
-    printf("Matriz guardada en %s!\n", fileName);
-
-    return 0;
+  if (matrix == NULL) {
+    fprintf(stderr, "ERROR: No fue posible asignar la memoria.\n");
+    exit(-1);
   }
+  char* fileName = argv[3];
+  FILE* file = fopen(fileName, "w");
+
+  if (file == NULL) {
+    fprintf(stderr, "ERROR: No fue posible abrir el fichero.\n");
+    exit(-1);
+  }
+
+  for (int i = 0; i < rowsNumber; i++) {
+    fprintf(file, "(");
+    for (int j = 0; j < columnsNumber; j++) {
+      printf("Escribe el valor [%i][%i] de la matriz.\n", i, j);
+      scanf("%f", &matrix[i * columnsNumber + j]);
+      fprintf(file, "%f", matrix[i * columnsNumber + j]);
+      if (j != columnsNumber - 1)
+        fprintf(file, "\t");
+    }
+    fprintf(file, ")\n");
+  }
+
+  fclose(file);
+  free(matrix);
+
+  printf("Matriz guardada en %s!\n", fileName);
+
+  return 0;
 }
