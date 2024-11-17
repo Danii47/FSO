@@ -53,10 +53,8 @@ float *multMatrix(float *matrixA, float *matrixB, int matrixARows, int matrixABC
   return matrixResult;
 }
 
-int main(int argc, char **argv)
-{
-  if (argc != 5)
-  {
+int main(int argc, char **argv) {
+  if (argc != 5) {
     fprintf(stderr, "ERROR: El número de argumentos es incorrecto.\n");
     exit(-1);
   }
@@ -99,7 +97,7 @@ int main(int argc, char **argv)
     fprintf(file, "(");
     for (int j = 0; j < matrixABColumnsRows; j++) {
       printf("Escribe el valor [%i][%i] de la matriz A.\n", i, j);
-      scanf("%.2f", &matrixA[i * matrixABColumnsRows + j]);
+      scanf("%f", &matrixA[i * matrixABColumnsRows + j]);
       fprintf(file, "%.2f", matrixA[i * matrixABColumnsRows + j]);
       if (j != matrixABColumnsRows - 1)
         fprintf(file, "\t");
@@ -113,7 +111,7 @@ int main(int argc, char **argv)
     fprintf(file, "(");
     for (int j = 0; j < matrixBColumns; j++) {
       printf("Escribe el valor [%i][%i] de la matriz B.\n", i, j);
-      scanf("%.2f", &matrixB[i * matrixBColumns + j]);
+      scanf("%f", &matrixB[i * matrixBColumns + j]);
       fprintf(file, "%.2f", matrixB[i * matrixBColumns + j]);
       if (j != matrixBColumns - 1)
         fprintf(file, "\t");
