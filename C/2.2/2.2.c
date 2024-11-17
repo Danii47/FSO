@@ -98,12 +98,14 @@ int main(int argc, char **argv)
     fprintf(file, ")\n");
   }
 
+  fprintf(file, "\n");
+  
   float sum = 0;
 
   for (int i = 0; i < matrixARows; i++) {
     for (int j = 0; j < matrixBcolumns; j++) {
       for (int k = 0; k < matrixABColumnsRows; k++) {
-        sum += matrixA[i * matrixABColumnsRows + j] * matrixB[j * matrixBcolumns + k];
+        sum += matrixA[i * matrixABColumnsRows + k] * matrixB[j * matrixBcolumns + k];
       }
       fprintf(file, "%f ", sum);
       sum = 0;
