@@ -30,6 +30,29 @@ bool isNumber(char *str) {
   return true;
 }
 
+float *multMatrix(float *matrixA, float *matrixB, int matrixARows, int matrixABColumnsRows, int matrixBColumns) {
+  float *matrixResult = (float *)malloc(sizeof(float) * (matrixARows * matrixBColumns));
+
+  if (matrixResult == NULL) {
+    fprintf(stderr, "ERROR: No fue posible asignar la memoria.\n");
+    exit(-1);
+  }
+
+  float sum = 0;
+
+  for (int i = 0; i < matrixARows; i++) {
+    for (int j = 0; j < matrixBColumns; j++) {
+      for (int k = 0; k < matrixABColumnsRows; k++) {
+        sum += matrixA[i * matrixABColumnsRows + k] * matrixB[k * matrixBColumns + j];
+      }
+      matrixResult[i * matrixBColumns + j] = sum;
+      sum = 0;
+    }
+  }
+
+  return matrixResult;
+}
+
 int main(int argc, char **argv)
 {
   if (argc != 5)
@@ -49,15 +72,15 @@ int main(int argc, char **argv)
 
   int matrixARows = atoi(matrixARowsString);
   int matrixABColumnsRows = atoi(matrixABRowsColumnsString);
-  int matrixBcolumns = atoi(matrixBcolumnsString);
+  int matrixBColumns = atoi(matrixBcolumnsString);
 
-  if (matrixARows > 10 || matrixARows < 1 || matrixABColumnsRows > 10 || matrixABColumnsRows < 1 || matrixBcolumns > 10 || matrixBcolumns < 1) {
+  if (matrixARows > 10 || matrixARows < 1 || matrixABColumnsRows > 10 || matrixABColumnsRows < 1 || matrixBColumns > 10 || matrixBColumns < 1) {
     fprintf(stderr, "ERROR: El número de filas / columnas es mayor que 10 o menor que 1.\n");
     exit(-1);
   }
 
   float *matrixA = (float *) malloc(sizeof(float) * (matrixARows * matrixABColumnsRows));
-  float *matrixB = (float *) malloc(sizeof(float) * (matrixABColumnsRows * matrixBcolumns));
+  float *matrixB = (float *) malloc(sizeof(float) * (matrixABColumnsRows * matrixBColumns));
 
   if (matrixA == NULL || matrixB == NULL) {
     fprintf(stderr, "ERROR: No fue posible asignar la memoria.\n");
@@ -76,8 +99,8 @@ int main(int argc, char **argv)
     fprintf(file, "(");
     for (int j = 0; j < matrixABColumnsRows; j++) {
       printf("Escribe el valor [%i][%i] de la matriz A.\n", i, j);
-      scanf("%f", &matrixA[i * matrixABColumnsRows + j]);
-      fprintf(file, "%f", matrixA[i * matrixABColumnsRows + j]);
+      scanf("%.2f", &matrixA[i * matrixABColumnsRows + j]);
+      fprintf(file, "%.2f", matrixA[i * matrixABColumnsRows + j]);
       if (j != matrixABColumnsRows - 1)
         fprintf(file, "\t");
     }
@@ -88,35 +111,40 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < matrixABColumnsRows; i++) {
     fprintf(file, "(");
-    for (int j = 0; j < matrixBcolumns; j++) {
+    for (int j = 0; j < matrixBColumns; j++) {
       printf("Escribe el valor [%i][%i] de la matriz B.\n", i, j);
-      scanf("%f", &matrixB[i * matrixBcolumns + j]);
-      fprintf(file, "%f", matrixB[i * matrixBcolumns + j]);
-      if (j != matrixBcolumns - 1)
+      scanf("%.2f", &matrixB[i * matrixBColumns + j]);
+      fprintf(file, "%.2f", matrixB[i * matrixBColumns + j]);
+      if (j != matrixBColumns - 1)
         fprintf(file, "\t");
     }
     fprintf(file, ")\n");
   }
 
   fprintf(file, "\n");
-  
-  float sum = 0;
+
+  float *matrixResult = multMatrix(matrixA, matrixB, matrixARows, matrixABColumnsRows, matrixBColumns);
 
   for (int i = 0; i < matrixARows; i++) {
-    for (int j = 0; j < matrixBcolumns; j++) {
-      for (int k = 0; k < matrixABColumnsRows; k++) {
-        sum += matrixA[i * matrixABColumnsRows + k] * matrixB[j * matrixBcolumns + k];
+    fprintf(file, "(");
+    printf("(");
+    for (int j = 0; j < matrixBColumns; j++) {
+      fprintf(file, "%.2f", matrixResult[i * matrixBColumns + j]);
+      printf("%.2f", matrixResult[i * matrixBColumns + j]);
+      if (j != matrixBColumns - 1) {
+        fprintf(file, "\t");
+        printf("\t");
       }
-      fprintf(file, "%f ", sum);
-      sum = 0;
     }
-    fprintf(file, "\n");
+    fprintf(file, ")\n");
+    printf(")\n");
   }
 
   fclose(file);
 
   free(matrixA);
   free(matrixB);
+  free(matrixResult);
 
   printf("Matriz guardada en %s!\n", fileName);
 
