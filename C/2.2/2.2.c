@@ -103,11 +103,12 @@ int main(int argc, char **argv)
   for (int i = 0; i < matrixARows; i++) {
     for (int j = 0; j < matrixBcolumns; j++) {
       for (int k = 0; k < matrixABColumnsRows; k++) {
-        sum += matrixA[i * matrixABColumnsRows + j] * matrixB[j * matrixABColumnsRows + k];
+        sum += matrixA[i * matrixABColumnsRows + j] * matrixB[j * matrixBcolumns + k];
       }
       fprintf(file, "%f ", sum);
       sum = 0;
     }
+    fprintf(file, "\n");
   }
 
   fclose(file);
