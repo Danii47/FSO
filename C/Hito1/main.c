@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     char *arg1 = argv[1];
     char *arg2 = argv[2];
     int estado = execl(path, comando, arg1, arg2, NULL);
-    if (estado = -1)
+    if (estado == -1)
     {
       fprintf(stderr, "Algo fue mal en el procesado.\n");
       exit(1);
