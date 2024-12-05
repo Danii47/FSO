@@ -17,7 +17,8 @@ typedef struct
 typedef struct
 {
   int tbuffer;
-  int *resultado;
+  int *i_c;
+  long *resultado;
 } arg_hilo_consumidor;
 
 typedef struct
@@ -32,9 +33,9 @@ sem_t hay_dato;
 sem_t hay_espacio;
 sem_t mutex_c;
 
-bool es_binario(char *cadena, int tam_cadena)
+bool es_binario(char *cadena)
 {
-  for (int i = 0; i < tam_cadena; i++)
+  for (int i = 0; i < strlen(cadena); i++)
   {
     if (cadena[i] != '0' && cadena[i] != '1')
     {
@@ -70,14 +71,13 @@ void *productor(void *arg)
   celda_buffer_t dato;
   while (getline(&cadena, &tam_buffer_cadena, arg_p->fichero_abierto) != -1)
   {
-    
 
-    tam_cadena = cadena[strlen(cadena) - 1] == '\n' ? strlen(cadena) - 1 : strlen(cadena);
+    cadena[strlen(cadena) - 1] = (cadena[strlen(cadena) - 1] == '\n') ? '\0' : cadena[strlen(cadena) - 1];
+    tam_cadena = strlen(cadena);
 
-    if (tam_cadena <= 32 && tam_cadena >= 1 && es_binario(cadena, tam_cadena))
+    if (tam_cadena <= 32 && tam_cadena >= 1 && es_binario(cadena))
     {
       sem_wait(&hay_espacio);
-      printf("Me reproduzco con la cadena %s\n", cadena);
       strcpy(dato.cadena, cadena);
       dato.longitud = tam_cadena;
       buffer[i_p] = dato;
@@ -86,10 +86,11 @@ void *productor(void *arg)
       sem_post(&hay_dato);
     }
   }
-
+  sem_wait(&hay_espacio);
   dato.longitud = -1;
   buffer[i_p] = dato;
   sem_post(&hay_dato);
+
   pthread_exit(NULL);
 }
 
@@ -97,36 +98,31 @@ void *consumidor(void *arg)
 {
   arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)arg;
   celda_buffer_t dato;
-  int suma = 0;
-  int i_c = 0;
+  long suma = 0;
   bool parada = false;
   while (!parada)
   {
     sem_wait(&hay_dato);
     sem_wait(&mutex_c);
-    dato = buffer[i_c];
-    
-    if (dato.longitud == -1)
-    {
-      sem_post(&hay_dato);
-      printf("[CON SALIDA] NO consumo dato %s | l: %d\n", dato.cadena, dato.longitud);
-      parada = true;
-    }
-    else
+    dato = buffer[*(arg_c->i_c)];
+    if (dato.longitud != -1)
     {
       if (dato.cadena[0] != '1' && dato.longitud == 32)
       {
-        printf("Consumo dato %s\n", dato.cadena);
         suma = (suma + atobtoi(dato.cadena)) % (RAND_MAX / 2);
-      } else {
-        printf("NO consumo dato %s | l: %d\n", dato.cadena, dato.longitud);
       }
-      i_c = (i_c + 1) % arg_c->tbuffer;
+
+      *(arg_c->i_c) = (*(arg_c->i_c) + 1) % arg_c->tbuffer;
       sem_post(&hay_espacio);
+    }
+    else
+    {
+      sem_post(&hay_dato);
+      parada = true;
     }
     sem_post(&mutex_c);
   }
-  printf("Se para hilo consumidor\n");
+
   *(arg_c->resultado) = suma;
   pthread_exit(NULL);
 }
@@ -257,7 +253,7 @@ int main(int argc, char *argv[])
 
     pthread_t id_productor;
 
-    int *array_resultados = (int *)malloc(sizeof(int) * nhilos);
+    long *array_resultados = (long *)malloc(sizeof(long) * nhilos);
     if (array_resultados == NULL)
     {
       fprintf(stderr, "No fue posible asignar la memoria.");
@@ -276,10 +272,12 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
+    int _ = 0;
     for (int i = 0; i < nhilos; i++)
     {
       arg_c[i].tbuffer = tbuffer;
       arg_c[i].resultado = &array_resultados[i];
+      arg_c[i].i_c = &_;
     }
 
     pthread_create(&id_productor, NULL, productor, (void *)&arg_p);
@@ -296,7 +294,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < nhilos; i++)
     {
-      printf("%d: %d\n", i, array_resultados[i]);
+      printf("%d: %ld\n", i, array_resultados[i]);
     }
 
     sem_destroy(&hay_dato);
@@ -308,7 +306,6 @@ int main(int argc, char *argv[])
     fclose(fs);
   }
 
-  printf("main: Procesado de fichero terminado.\n");
-  // TODO: preguntar por que da error si cierro los ficheros tambien en el proceso padre.
+  printf("main: FINALIZADO.\n");
   exit(0);
 }
