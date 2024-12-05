@@ -46,5 +46,5 @@ else
 fi
 
 # Crear un archivo zip de la carpeta actual
-tar -czf "$tar_file" -C "$HOME/FSO" "C"
+tar --exclude="C/*/*.txt" -czf "$tar_file" -C "$HOME/FSO" "C"
 echo -e "\033[1;34mCreado el comprimido: $tar_file\033[0m"
