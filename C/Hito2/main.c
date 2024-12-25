@@ -50,11 +50,11 @@ int atobtoi(char *cadena)
 {
   int n = 0;
 
-  for (int i = strlen(cadena); i >= 0; i--)
+  for (int i = 0; i < strlen(cadena); i++)
   {
     if (cadena[i] == '1')
     {
-      n += pow(2, strlen(cadena) - i);
+      n += pow(2, strlen(cadena) - i - 1);
     }
   }
 
@@ -88,6 +88,7 @@ void *productor(void *arg)
   }
   sem_wait(&hay_espacio);
   dato.longitud = -1;
+  strcpy(dato.cadena, "");
   buffer[i_p] = dato;
   sem_post(&hay_dato);
 
@@ -111,7 +112,6 @@ void *consumidor(void *arg)
       {
         suma = (suma + atobtoi(dato.cadena)) % (RAND_MAX / 2);
       }
-
       *(arg_c->i_c) = (*(arg_c->i_c) + 1) % arg_c->tbuffer;
       sem_post(&hay_espacio);
     }
@@ -122,7 +122,6 @@ void *consumidor(void *arg)
     }
     sem_post(&mutex_c);
   }
-
   *(arg_c->resultado) = suma;
   pthread_exit(NULL);
 }
@@ -212,10 +211,11 @@ int main(int argc, char *argv[])
 
   if (pid == 0)
   {
-    char *path = "/home/J5/12474427D/FSO/C/Hito2/procesa";
-    char *comando = "./procesa";
+    char *path = "/home/J5/12474427D/FSO/C/Hito2/procesa.out";
+    char *comando = "./procesa.out";
     char *arg1 = argv[1];
     char *arg2 = argv[2];
+
     int estado = execl(path, comando, arg1, arg2, NULL);
     if (estado == -1)
     {
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
 
     if (fs == NULL)
     {
-      fprintf(stderr, "El primer fichero debe existir\n");
+      fprintf(stderr, "El segundo fichero debe existir despues de ejecutar procesa\n");
       exit(1);
     }
 
@@ -296,6 +296,13 @@ int main(int argc, char *argv[])
     {
       printf("%d: %ld\n", i, array_resultados[i]);
     }
+
+    long suma = 0;
+    for (int i = 0; i < nhilos; i++) {
+      suma = (suma + array_resultados[i]) % (RAND_MAX / 2);
+    }
+
+    printf("%ld\n", suma);
 
     sem_destroy(&hay_dato);
     sem_destroy(&hay_espacio);
