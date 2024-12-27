@@ -275,7 +275,11 @@ int main(int argc, char *argv[]) {
 
   int pid = fork();
 
-  if (pid == 0) {
+  if (pid == -1) {
+    perror("Error al hacer fork");
+    return EXIT_FAILURE;
+
+  } else if (pid == 0) {
     char *path = "./procesa.out";
     char *comando = "./procesa.out";
     char *arg1 = argv[1];
