@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
       arg_c[i].i_c = &_;
       arg_c[i].id_hilo = i;
     }
-  
+
     nodo_lista *nodo_incial_sumador = nodo_inicial;
 
     arg_hilo_sumador arg_s;
@@ -372,6 +372,6 @@ int main(int argc, char *argv[]) {
     free(buffer);
     fclose(fs);
   }
-  
+
   exit(0);
 }
