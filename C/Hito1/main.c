@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
 
   if (pid == 0)
   {
-    char *path = "/home/J5/12474427D/FSO/C/Hito1/procesa";
-    char *comando = "./procesa";
+    char *path = "./procesa.out";
+    char *comando = "./procesa.out";
     char *arg1 = argv[1];
     char *arg2 = argv[2];
     int estado = execl(path, comando, arg1, arg2, NULL);
