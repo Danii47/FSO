@@ -16,7 +16,7 @@ typedef struct {
 typedef struct {
   int tbuffer;
   int *i_c;
-  long *resultado;
+  int *resultado;
 } arg_hilo_consumidor;
 
 typedef struct {
@@ -86,7 +86,7 @@ void *productor(void *arg) {
 void *consumidor(void *arg) {
   arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)arg;
   celda_buffer_t dato;
-  long suma = 0;
+  int suma = 0;
   bool parada = false;
   while (!parada) {
     sem_wait(&hay_dato);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 
     pthread_t id_productor;
 
-    long *array_resultados = (long *)malloc(sizeof(long) * nhilos);
+    int *array_resultados = (int *)malloc(sizeof(int) * nhilos);
     if (array_resultados == NULL) {
       fprintf(stderr, "No fue posible asignar la memoria.");
       fclose(fs);
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
       printf("%d: %ld\n", i, array_resultados[i]);
     }
 
-    long suma = 0;
+    int suma = 0;
     for (int i = 0; i < nhilos; i++) {
       suma = (suma + array_resultados[i]) % (RAND_MAX / 2);
     }
