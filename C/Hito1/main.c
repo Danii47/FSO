@@ -9,20 +9,20 @@ int main(int argc, char *argv[]) {
   FILE *fs;
 
   if (argc != 3) {
-    fprintf(stderr, "Error en argumentos\n");
-    exit(1);
+    fprintf(stderr, "Error en el numero argumentos.\n");
+    exit(EXIT_FAILURE);
   }
 
   fe = fopen(argv[1], "r");
 
   if (fe == NULL) {
-    fprintf(stderr, "El primer fichero debe existir\n");
+    fprintf(stderr, "El primer fichero debe existir.\n");
     exit(1);
   }
 
   fs = fopen(argv[2], "r");
   if (fs != NULL) {
-    fprintf(stderr, "El segundo fichero no debe existir\n");
+    fprintf(stderr, "El segundo fichero no debe existir.\n");
     fclose(fs);
     fclose(fe);
     exit(1);
@@ -35,14 +35,22 @@ int main(int argc, char *argv[]) {
     char *comando = "./procesa.out";
     char *arg1 = argv[1];
     char *arg2 = argv[2];
-    int estado = execl(path, comando, arg1, arg2, NULL);
-    if (estado == -1) {
-      fprintf(stderr, "Algo fue mal en el procesado.\n");
-      exit(1);
-    }
-    exit(0);
+
+    execl(path, comando, arg1, arg2, NULL);
+    perror("Algo fue mal en el procesado");
+    exit(EXIT_FAILURE);
+
   } else {
-    wait(NULL);
+    int estado;
+    if (wait(&estado) == -1) {
+      perror("Error al esperar al hijo");
+      return EXIT_FAILURE;
+    }
+
+    if (!WIFEXITED(estado)) {
+      fprintf(stderr, "El proceso hijo terminó de forma anormal.\n");
+      return EXIT_FAILURE;
+    }
   }
   printf("main: Procesado de fichero terminado.\n");
   exit(0);

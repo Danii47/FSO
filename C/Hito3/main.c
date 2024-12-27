@@ -177,7 +177,7 @@ nodo_lista *crear_nodos(unsigned short nhilos) {
   nodo_lista *inicio = (nodo_lista *)malloc(sizeof(nodo_lista));
 
   if (inicio == NULL) {
-    perror("Error al asignar memoria\n");
+    perror("Hubo un error al asignar memoria para el nodo inicial de la lista enlazada");
     exit(EXIT_FAILURE);
   }
 
@@ -190,7 +190,7 @@ nodo_lista *crear_nodos(unsigned short nhilos) {
   for (unsigned short i = 1; i < nhilos; i++) {
     nodo_lista *nuevo_nodo = (nodo_lista *)malloc(sizeof(nodo_lista));
     if (nuevo_nodo == NULL) {
-      perror("Error al asignar memoria");
+      perror("Hubo un error al asignar memoria para un nodo de la lista enlazada");
       exit(EXIT_FAILURE);
     }
 
@@ -212,23 +212,23 @@ int main(int argc, char *argv[]) {
   FILE *fsum;
 
   if (argc != 6) {
-    fprintf(stderr, "Error en argumentos\n");
-    exit(1);
+    fprintf(stderr, "Error en el numero argumentos.\n");
+    exit(EXIT_FAILURE);
   }
 
   fe = fopen(argv[1], "r");
 
   if (fe == NULL) {
-    fprintf(stderr, "El primer fichero debe existir\n");
-    exit(1);
+    fprintf(stderr, "El primer fichero debe existir.\n");
+    exit(EXIT_FAILURE);
   }
 
   fs = fopen(argv[2], "r");
   if (fs != NULL) {
-    fprintf(stderr, "El segundo fichero no debe existir\n");
+    fprintf(stderr, "El segundo fichero no debe existir.\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   char *hilos = argv[3];
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "El parametro de hilos no es numerico.\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   int nhilos = atoi(hilos);
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "El parametro de hilos debe ser un numero en el intervalo [2, 1000].\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   char *tbuffer_str = argv[4];
@@ -253,7 +253,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "El parametro de hilos no es numerico.\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   int tbuffer = atoi(tbuffer_str);
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "El parametro de tamaño de buffer debe ser un numero en el intervalo [10, 1000].\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   fsum = fopen(argv[5], "w");
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Hubo un problema al abrir el fichero de resultados.\n");
     fclose(fs);
     fclose(fe);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   int pid = fork();
@@ -281,26 +281,34 @@ int main(int argc, char *argv[]) {
     char *arg1 = argv[1];
     char *arg2 = argv[2];
 
-    int estado = execl(path, comando, arg1, arg2, NULL);
-    if (estado == -1) {
-      fprintf(stderr, "Algo fue mal en el procesado.\n");
-      exit(1);
-    }
+    execl(path, comando, arg1, arg2, NULL);
+    perror("Algo fue mal en el procesado");
+    exit(EXIT_FAILURE);
+
   } else {
-    wait(NULL);
+    int estado;
+    if (wait(&estado) == -1) {
+      perror("Error al esperar al hijo");
+      return EXIT_FAILURE;
+    }
+
+    if (!WIFEXITED(estado)) {
+      fprintf(stderr, "El proceso hijo terminó de forma anormal.\n");
+      return EXIT_FAILURE;
+    }
 
     fs = fopen(argv[2], "r");
 
     if (fs == NULL) {
-      fprintf(stderr, "El segundo fichero debe existir despues de ejecutar procesa\n");
-      exit(1);
+      perror("Ocurrio un error al intentar abrir el segundo fichero despues de ejecutar procesa");
+      exit(EXIT_FAILURE);
     }
 
     buffer = (celda_buffer_t *)malloc(sizeof(celda_buffer_t) * tbuffer);
     if (buffer == NULL) {
-      fprintf(stderr, "No fue posible asignar la memoria.");
+      perror("Hubo un problema al intentar asignar memoria para el buffer de datos");
       fclose(fs);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
     sem_init(&hay_dato, 0, 0);
@@ -318,17 +326,17 @@ int main(int argc, char *argv[]) {
     arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)malloc(sizeof(arg_hilo_consumidor) * nhilos);
 
     if (arg_c == NULL) {
-      fprintf(stderr, "No fue posible asignar la memoria.");
+      perror("Hubo un problema al intentar asignar memoria para el array de argumentos de los consumidores");
       fclose(fs);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
     pthread_t *ids_consumidor = (pthread_t *)malloc(sizeof(pthread_t) * nhilos);
 
     if (ids_consumidor == NULL) {
-      fprintf(stderr, "No fue posible asignar la memoria.");
+      perror("Hubo un problema al intentar asignar memoria para el array de ids de los consumidores");
       fclose(fs);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
     pthread_t id_sumador;
@@ -373,5 +381,7 @@ int main(int argc, char *argv[]) {
     fclose(fs);
   }
 
-  exit(0);
+  printf("main: Procesado de fichero terminado.\n");
+
+  return EXIT_SUCCESS;
 }
