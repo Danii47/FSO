@@ -31,12 +31,18 @@ typedef struct {
   nodo_lista **nodo;
 } arg_hilo_consumidor;
 
+typedef struct {
+  FILE *arc_resultados;
+  nodo_lista *nodo;
+} arg_hilo_sumador;
+
 celda_buffer_t *buffer;
 
 sem_t hay_dato;
 sem_t hay_espacio;
 sem_t mutex_c;
 sem_t mutex_l;
+sem_t hay_suma;
 
 bool es_binario(char *cadena) {
   for (int i = 0; i < strlen(cadena); i++) {
@@ -102,6 +108,7 @@ void *consumidor(void *arg) {
   while (!parada) {
     sem_wait(&hay_dato);
     sem_wait(&mutex_c);
+
     dato = buffer[*(arg_c->i_c)];
     if (dato.longitud != -1) {
       if (dato.cadena[0] != '1' && dato.longitud == 32) {
@@ -131,7 +138,27 @@ void *consumidor(void *arg) {
   (*nodo)->id = arg_c->id_hilo;
   (*nodo)->suma_parcial_truncada = suma;
   *nodo = (*nodo)->siguiente;
+  sem_post(&hay_suma);
   sem_post(&mutex_l);
+  pthread_exit(NULL);
+}
+
+void *sumador(void *arg) {
+  arg_hilo_sumador *arg_s = (arg_hilo_sumador *)arg;
+
+  nodo_lista *nodo = arg_s->nodo;
+  long suma_total_truncada = 0;
+
+  while (nodo != NULL) {
+    sem_wait(&hay_suma);
+
+    fprintf(arg_s->arc_resultados, "Hilo %d | Suma parcial: %d\n", nodo->id, nodo->suma_parcial_truncada);
+    suma_total_truncada = (suma_total_truncada + nodo->suma_parcial_truncada) % (RAND_MAX / 2);
+    nodo = nodo->siguiente;
+  }
+
+  fprintf(arg_s->arc_resultados, "Suma total: %d\n", suma_total_truncada);
+
   pthread_exit(NULL);
 }
 
@@ -182,8 +209,9 @@ int main(int argc, char *argv[]) {
 
   FILE *fe;
   FILE *fs;
+  FILE *fsum;
 
-  if (argc != 5) {
+  if (argc != 6) {
     fprintf(stderr, "Error en argumentos\n");
     exit(1);
   }
@@ -237,6 +265,14 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+  fsum = fopen(argv[5], "w");
+  if (fsum == NULL) {
+    fprintf(stderr, "Hubo un problema al abrir el fichero de resultados.\n");
+    fclose(fs);
+    fclose(fe);
+    exit(1);
+  }
+
   int pid = fork();
 
   if (pid == 0) {
@@ -271,6 +307,7 @@ int main(int argc, char *argv[]) {
     sem_init(&hay_espacio, 0, tbuffer);
     sem_init(&mutex_c, 0, 1);
     sem_init(&mutex_l, 0, 1);
+    sem_init(&hay_suma, 0, 0);
 
     arg_hilo_productor arg_p;
     arg_p.fichero_abierto = fs;
@@ -280,6 +317,12 @@ int main(int argc, char *argv[]) {
 
     arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)malloc(sizeof(arg_hilo_consumidor) * nhilos);
 
+    if (arg_c == NULL) {
+      fprintf(stderr, "No fue posible asignar la memoria.");
+      fclose(fs);
+      exit(1);
+    }
+
     pthread_t *ids_consumidor = (pthread_t *)malloc(sizeof(pthread_t) * nhilos);
 
     if (ids_consumidor == NULL) {
@@ -288,43 +331,47 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
 
+    pthread_t id_sumador;
+
     nodo_lista *nodo_inicial = crear_nodos(nhilos);
-    nodo_lista *nodo_recorr = nodo_inicial;
+    nodo_lista *nodo_inicial_consumidor = nodo_inicial;
 
     unsigned short _ = 0;
     for (unsigned short i = 0; i < nhilos; i++) {
       arg_c[i].tbuffer = tbuffer;
-      arg_c[i].nodo = &nodo_recorr;
+      arg_c[i].nodo = &nodo_inicial_consumidor;
       arg_c[i].i_c = &_;
       arg_c[i].id_hilo = i;
     }
+  
+    nodo_lista *nodo_incial_sumador = nodo_inicial;
+
+    arg_hilo_sumador arg_s;
+    arg_s.arc_resultados = fsum;
+    arg_s.nodo = nodo_incial_sumador;
 
     pthread_create(&id_productor, NULL, productor, (void *)&arg_p);
-    for (int i = 0; i < nhilos; i++) {
+    for (unsigned short i = 0; i < nhilos; i++) {
       pthread_create(&ids_consumidor[i], NULL, consumidor, (void *)&arg_c[i]);
     }
+    pthread_create(&id_sumador, NULL, sumador, (void *)&arg_s);
 
     pthread_join(id_productor, NULL);
-    for (int i = 0; i < nhilos; i++) {
+    for (unsigned short i = 0; i < nhilos; i++) {
       pthread_join(ids_consumidor[i], NULL);
     }
-
-    nodo_lista *nodo_recorrer2 = nodo_inicial;
-    while (nodo_recorrer2 != NULL) {
-      printf("%d: %ld\n", nodo_recorrer2->id, nodo_recorrer2->suma_parcial_truncada);
-      nodo_recorrer2 = nodo_recorrer2->siguiente;
-    }
+    pthread_join(id_sumador, NULL);
 
     sem_destroy(&hay_dato);
     sem_destroy(&hay_espacio);
     sem_destroy(&mutex_c);
     sem_destroy(&mutex_l);
+    sem_destroy(&hay_suma);
 
     free(ids_consumidor);
     free(buffer);
     fclose(fs);
   }
-
-  printf("main: FINALIZADO.\n");
+  
   exit(0);
 }
