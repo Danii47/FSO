@@ -1,6 +1,10 @@
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
+
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  * Funcion que comprueba si una cadena esta compuesta unicamente por numeros

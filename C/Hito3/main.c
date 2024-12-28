@@ -1,17 +1,29 @@
-#include <math.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
 
+#include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <sys/wait.h>
+#include <semaphore.h>
+#include <pthread.h>
+
+/**
+ * Estructura que almacena un nodo de la lista enlazada
+ * 
+ * Los datos que contiene son:
+ * `unsigned short` `id` - id del hilo
+ * `unsigned int` `suma_parcial_truncada` - suma parcial truncada del hilo
+ * `struct nodo_lista *` `siguiente_nodo` - puntero al siguiente nodo, del mismo tipo
+ */
 typedef struct {
   unsigned short id;
   unsigned int suma_parcial_truncada;
-  struct nodo_lista *siguiente;
+  struct nodo_lista *siguiente_nodo;
 } nodo_lista;
 
 /**
@@ -236,7 +248,7 @@ void *consumidor(void *arg) {
   sem_wait(&mutex_l);
   (*nodo)->id = arg_c->id_hilo;
   (*nodo)->suma_parcial_truncada = suma;
-  *nodo = (*nodo)->siguiente;
+  *nodo = (*nodo)->siguiente_nodo;
   sem_post(&hay_suma);
   sem_post(&mutex_l);
   pthread_exit(NULL);
@@ -253,7 +265,7 @@ void *sumador(void *arg) {
 
     fprintf(arg_s->arc_resultados, "Hilo %d | Suma parcial: %d\n", nodo->id, nodo->suma_parcial_truncada);
     suma_total_truncada = (suma_total_truncada + nodo->suma_parcial_truncada) % (RAND_MAX / 2);
-    nodo = nodo->siguiente;
+    nodo = nodo->siguiente_nodo;
   }
 
   fprintf(arg_s->arc_resultados, "Suma total: %d\n", suma_total_truncada);
@@ -296,7 +308,7 @@ nodo_lista *crear_nodos(unsigned short numero_nodos) {
 
   inicio->id = 0;
   inicio->suma_parcial_truncada = 0;
-  inicio->siguiente = NULL;
+  inicio->siguiente_nodo = NULL;
 
   nodo_lista *actual = inicio;
 
@@ -309,9 +321,9 @@ nodo_lista *crear_nodos(unsigned short numero_nodos) {
 
     nuevo_nodo->id = i;
     nuevo_nodo->suma_parcial_truncada = 0;
-    nuevo_nodo->siguiente = NULL;
+    nuevo_nodo->siguiente_nodo = NULL;
 
-    actual->siguiente = nuevo_nodo;
+    actual->siguiente_nodo = nuevo_nodo;
     actual = nuevo_nodo;
   }
 

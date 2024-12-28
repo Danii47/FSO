@@ -1,7 +1,11 @@
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
 
 /**
  * Funcion principal del programa

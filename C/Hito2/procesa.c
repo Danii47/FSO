@@ -1,3 +1,7 @@
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

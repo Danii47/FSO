@@ -1,3 +1,7 @@
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +10,7 @@
  * Funcion que comprueba si una cadena esta compuesta unicamente por numeros
  *
  * @param cadena puntero al inicio de la cadena donde esta el string
- * 
+ *
  * @return true si la cadena esta unicamente compuesta por numeros
  */
 bool es_numerico(char *cadena) {

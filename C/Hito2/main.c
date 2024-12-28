@@ -1,3 +1,7 @@
+/**
+ * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
+ */
+
 #include <math.h>
 #include <pthread.h>
 #include <semaphore.h>
