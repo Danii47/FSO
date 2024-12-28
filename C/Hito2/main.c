@@ -187,7 +187,7 @@ void *consumidor(void *arg) {
 /**
  * Funcion que comprueba si una cadena de caracteres esta compuesta unicamente por numeros
  *
- * @param cadena - puntero al inicio de la cadena donde esta el string
+ * @param cadena puntero al inicio de la cadena donde esta el string
  *
  * @return true si la cadena esta unicamente compuesta por numeros
  */

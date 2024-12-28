@@ -2,66 +2,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-bool es_numerico(char *cadenaLeida) {
+/**
+ * Funcion que comprueba si una cadena esta compuesta unicamente por numeros
+ *
+ * @param cadena puntero al inicio de la cadena donde esta el string
+ *
+ * @return true si la cadena esta unicamente compuesta por numeros
+ */
+bool es_numerico(char *cadena) {
 
-  if (cadenaLeida[0] == '\n')
+  if (cadena[0] == '\n')
     return false;
 
   int i = 0;
 
-  while (cadenaLeida[i] != '\n' && cadenaLeida[i] != '\0') {
-
-    if (cadenaLeida[i] > '9' || cadenaLeida[i] < '0') {
+  while (cadena[i] != '\n' && cadena[i] != '\0') {
+    if (cadena[i] > '9' || cadena[i] < '0') {
       return false;
     }
-
     i++;
   }
 
   return true;
 }
 
+/**
+ * Funcion principal del programa
+ *
+ * @param argc numero de argumentos en la llamada al programa
+ * @param argv matriz de caracteres con los valores de cada argumento
+ *
+ * Los argumentos de procesa (3) son:
+ * 0: ejecucion del programa (./procesa.out)
+ * 1: nombre del fichero de entrada (ejemplo100.txt)
+ * 2: nombre del fichero de salida (salida.txt)
+ *
+ * @return 0 en caso de que no haya ningun error
+ */
 int main(int argc, char *argv[]) {
-
-  FILE *fe;
-  FILE *fs;
+  FILE *fichero_entrada_procesa;
+  FILE *fichero_salida_procesa;
 
   if (argc != 3) {
     fprintf(stderr, "Error en el numero de argumentos.\n");
     exit(1);
   }
 
-  fe = fopen(argv[1], "r");
+  fichero_entrada_procesa = fopen(argv[1], "r");
 
-  if (fe == NULL) {
+  if (fichero_entrada_procesa == NULL) {
     fprintf(stderr, "El primer fichero debe existir.\n");
     exit(1);
   }
 
-  fs = fopen(argv[2], "r");
-  if (fs != NULL) {
+  fichero_salida_procesa = fopen(argv[2], "r");
+  if (fichero_salida_procesa != NULL) {
     fprintf(stderr, "El segundo fichero no debe existir.\n");
-    fclose(fs);
-    fclose(fe);
+    fclose(fichero_salida_procesa);
+    fclose(fichero_entrada_procesa);
     exit(1);
   }
 
-  fs = fopen(argv[2], "w");
+  fichero_salida_procesa = fopen(argv[2], "w");
 
-  char cadenaLeida;
-  char *punteroCadenaLeida = &cadenaLeida;
+  char cadena_leida;
+  char *puntero_cadena_leida = &cadena_leida;
   size_t tam;
 
-  while (getline(&punteroCadenaLeida, &tam, fe) != -1) {
-    if (es_numerico(punteroCadenaLeida)) {
-      fprintf(fs, "%s", punteroCadenaLeida);
+  while (getline(&puntero_cadena_leida, &tam, fichero_entrada_procesa) != -1) {
+    if (es_numerico(puntero_cadena_leida)) {
+      fprintf(fichero_salida_procesa, "%s", puntero_cadena_leida);
     }
   }
 
   printf("procesa: Procesado el fichero %s. Resultado escrito en %s.\n", argv[1], argv[2]);
 
-  free(punteroCadenaLeida);
-  fclose(fe);
-  fclose(fs);
+  free(puntero_cadena_leida);
+  fclose(fichero_entrada_procesa);
+  fclose(fichero_salida_procesa);
   exit(0);
 }
