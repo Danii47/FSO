@@ -69,7 +69,7 @@ sem_t hay_espacio;
 /**
  * Semaforo binario que controla el acceso a la zona critica de los hilos consumidores, se encarga de que no intenten acceder dos hilos consumidores a la vez al mismo indice
  */
-sem_t mutex_c;
+sem_t mutex_buffer;
 
 /**
  * Funcion que comprueba si una cadena es un numero binario
@@ -170,7 +170,7 @@ void *consumidor(void *arg) {
   bool parada = false;
   while (!parada) {
     sem_wait(&hay_dato);
-    sem_wait(&mutex_c);
+    sem_wait(&mutex_buffer);
     dato = buffer[*(arg_c->indice_consumidor)];
     if (dato.longitud != 255) {
       if (dato.cadena[0] != '1' && dato.longitud == 32) {
@@ -182,7 +182,7 @@ void *consumidor(void *arg) {
       sem_post(&hay_dato);
       parada = true;
     }
-    sem_post(&mutex_c);
+    sem_post(&mutex_buffer);
   }
   *(arg_c->resultado) = suma;
   pthread_exit(NULL);
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]) {
     // Inicializacion de semaforos
     sem_init(&hay_dato, 0, 0);
     sem_init(&hay_espacio, 0, tamano_buffer);
-    sem_init(&mutex_c, 0, 1);
+    sem_init(&mutex_buffer, 0, 1);
 
     // Hilo productor
     pthread_t id_productor;
@@ -402,7 +402,7 @@ int main(int argc, char *argv[]) {
     // Destruccion de semaforos
     sem_destroy(&hay_dato);
     sem_destroy(&hay_espacio);
-    sem_destroy(&mutex_c);
+    sem_destroy(&mutex_buffer);
 
     // Liberacion de memoria
     free(ids_consumidores);

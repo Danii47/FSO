@@ -97,12 +97,12 @@ sem_t hay_espacio;
 /**
  * Semaforo binario que controla el acceso a la zona critica de los hilos consumidores, se encarga de que no intenten acceder dos hilos consumidores a la vez al mismo indice
  */
-sem_t mutex_c;
+sem_t mutex_buffer;
 
 /**
  * Semaforo binario que controla el acceso a la zona critica donde los hilos consumidores acceden a la lista enlazada
  */
-sem_t mutex_l;
+sem_t mutex_lista_enlazada;
 
 /**
  * Semaforo que representa si hay dato en la lista enlazada, en caso de no haber el hilo sumador queda bloqueado esperando
@@ -218,7 +218,7 @@ void *consumidor(void *arg) {
 
   while (!parada) {
     sem_wait(&hay_dato);
-    sem_wait(&mutex_c);
+    sem_wait(&mutex_buffer);
 
     dato = buffer[*(arg_c->indice_consumidor)];
     if (dato.longitud != 255) {
@@ -243,14 +243,14 @@ void *consumidor(void *arg) {
       sem_post(&hay_dato);
       parada = true;
     }
-    sem_post(&mutex_c);
+    sem_post(&mutex_buffer);
   }
-  sem_wait(&mutex_l);
+  sem_wait(&mutex_lista_enlazada);
   (*nodo)->id = arg_c->id_hilo;
   (*nodo)->suma_parcial_truncada = suma;
   *nodo = (*nodo)->siguiente_nodo;
   sem_post(&hay_suma);
-  sem_post(&mutex_l);
+  sem_post(&mutex_lista_enlazada);
   pthread_exit(NULL);
 }
 
@@ -456,8 +456,8 @@ int main(int argc, char *argv[]) {
     // Inicializacion de semaforos
     sem_init(&hay_dato, 0, 0);
     sem_init(&hay_espacio, 0, tamano_buffer);
-    sem_init(&mutex_c, 0, 1);
-    sem_init(&mutex_l, 0, 1);
+    sem_init(&mutex_buffer, 0, 1);
+    sem_init(&mutex_lista_enlazada, 0, 1);
     sem_init(&hay_suma, 0, 0);
 
     // Hilo productor
@@ -531,8 +531,8 @@ int main(int argc, char *argv[]) {
     // Destruccion de semaforos
     sem_destroy(&hay_dato);
     sem_destroy(&hay_espacio);
-    sem_destroy(&mutex_c);
-    sem_destroy(&mutex_l);
+    sem_destroy(&mutex_buffer);
+    sem_destroy(&mutex_lista_enlazada);
     sem_destroy(&hay_suma);
 
     // Liberacion de memoria
