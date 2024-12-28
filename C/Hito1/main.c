@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   if (id_proceso == -1) {
     perror("Error al hacer fork");
     return EXIT_FAILURE;
-    
+
   } else if (id_proceso == 0) {
     char *ruta_proceso = "./procesa.out";
     char *comando = "./procesa.out";

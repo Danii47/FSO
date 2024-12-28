@@ -349,7 +349,7 @@ int main(int argc, char *argv[]) {
     }
 
     int *array_resultados = (int *)malloc(sizeof(int) * numero_hilos);
-    
+
     if (array_resultados == NULL) {
       perror("Hubo un problema al intentar asignar memoria para el array de argumentos de resultados");
       free(ids_consumidores);
