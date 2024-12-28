@@ -3,44 +3,57 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+/**
+ * Funcion principal del programa
+ *
+ * @param argc numero de argumentos en la llamada al programa
+ * @param argv matriz de caracteres con los valores de cada argumento
+ *
+ * Los argumentos en el Hito 1 (3) son:
+ * 0: ejecucion del programa (./main.out)
+ * 1: nombre del fichero de entrada (ejemplo100.txt)
+ * 2: nombre del fichero de salida (salida.txt)
+ *
+ * @return 0 en caso de que no haya ningun error
+ */
 int main(int argc, char *argv[]) {
 
-  FILE *fe;
-  FILE *fs;
+  FILE *fichero_entrada_procesa;
+  FILE *fichero_salida_procesa;
 
   if (argc != 3) {
     fprintf(stderr, "Error en el numero argumentos.\n");
     exit(EXIT_FAILURE);
   }
 
-  fe = fopen(argv[1], "r");
+  fichero_entrada_procesa = fopen(argv[1], "r");
 
-  if (fe == NULL) {
+  if (fichero_entrada_procesa == NULL) {
     fprintf(stderr, "El primer fichero debe existir.\n");
     exit(1);
   }
 
-  fs = fopen(argv[2], "r");
-  if (fs != NULL) {
+  fichero_salida_procesa = fopen(argv[2], "r");
+  if (fichero_salida_procesa != NULL) {
     fprintf(stderr, "El segundo fichero no debe existir.\n");
-    fclose(fs);
-    fclose(fe);
+    fclose(fichero_salida_procesa);
+    fclose(fichero_entrada_procesa);
     exit(1);
   }
 
-  int pid = fork();
+  pid_t id_proceso = fork();
 
-  if (pid == -1) {
+  if (id_proceso == -1) {
     perror("Error al hacer fork");
     return EXIT_FAILURE;
     
-  } else if (pid == 0) {
-    char *path = "./procesa.out";
+  } else if (id_proceso == 0) {
+    char *ruta_proceso = "./procesa.out";
     char *comando = "./procesa.out";
-    char *arg1 = argv[1];
-    char *arg2 = argv[2];
+    char *argumento_1 = argv[1];
+    char *argumento_2 = argv[2];
 
-    execl(path, comando, arg1, arg2, NULL);
+    execl(ruta_proceso, comando, argumento_1, argumento_2, NULL);
     perror("Algo fue mal en el procesado");
     exit(EXIT_FAILURE);
 
@@ -57,5 +70,5 @@ int main(int argc, char *argv[]) {
     }
   }
   printf("main: Procesado de fichero terminado.\n");
-  exit(0);
+  return 0;
 }
