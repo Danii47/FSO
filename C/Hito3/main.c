@@ -3,24 +3,23 @@
  */
 
 #include <math.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/wait.h>
-#include <semaphore.h>
 #include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 /**
  * Estructura que almacena un nodo de la lista enlazada
- * 
+ *
  * Los datos que contiene son:
  * `unsigned short` `id` - id del hilo
  * `unsigned int` `suma_parcial_truncada` - suma parcial truncada del hilo
  * `struct nodo_lista *` `siguiente_nodo` - puntero al siguiente nodo, del mismo tipo
  */
-typedef struct {
+typedef struct nodo_lista {
   unsigned short id;
   unsigned int suma_parcial_truncada;
   struct nodo_lista *siguiente_nodo;
@@ -114,16 +113,16 @@ sem_t hay_suma;
  *
  * @param cadena puntero al inicio de la cadena donde esta el string
  *
- * @return true en caso de que solo contenga 1's y 0's
+ * @return 1 en caso de que solo contenga 1's y 0's
  */
-bool es_binario(char *cadena) {
+unsigned char es_binario(char *cadena) {
   for (int i = 0; i < strlen(cadena); i++) {
     if (cadena[i] != '0' && cadena[i] != '1') {
-      return false;
+      return 0;
     }
   }
 
-  return true;
+  return 1;
 }
 
 /**
@@ -159,30 +158,35 @@ int atobtoi(char *cadena) {
  * @param arg del tipo `arg_hilo_productor *` contiene todos los argumentos necesarios para el hilo productor
  */
 void *productor(void *arg) {
-  arg_hilo_productor *arg_p = (arg_hilo_productor *)arg;
+  arg_hilo_productor *argumentos_hilo_productor = (arg_hilo_productor *)arg;
   char *cadena = NULL;
   int indice_productor = 0;
+  unsigned int tamano_cadena;
+
+  unsigned short tamano_buffer = argumentos_hilo_productor->tamano_buffer;
+
   size_t tam_buffer_cadena;
-  int tam_cadena;
   celda_buffer_t dato;
-  while (getline(&cadena, &tam_buffer_cadena, arg_p->fichero_abierto) != -1) {
 
+  while (getline(&cadena, &tam_buffer_cadena, argumentos_hilo_productor->fichero_abierto) != -1) {
     cadena[strlen(cadena) - 1] = (cadena[strlen(cadena) - 1] == '\n') ? '\0' : cadena[strlen(cadena) - 1];
-    tam_cadena = strlen(cadena);
+    tamano_cadena = strlen(cadena);
 
-    if (tam_cadena <= 32 && tam_cadena >= 1 && es_binario(cadena)) {
+    if (tamano_cadena <= 32 && tamano_cadena >= 1 && es_binario(cadena)) {
       sem_wait(&hay_espacio);
+
       strcpy(dato.cadena, cadena);
-      dato.longitud = tam_cadena;
+      dato.longitud = tamano_cadena;
+
       buffer[indice_productor] = dato;
-      indice_productor = (indice_productor + 1) % arg_p->tamano_buffer;
+
+      indice_productor = (indice_productor + 1) % tamano_buffer;
 
       sem_post(&hay_dato);
     }
   }
   sem_wait(&hay_espacio);
   dato.longitud = 255;
-  strcpy(dato.cadena, "");
   buffer[indice_productor] = dato;
   sem_post(&hay_dato);
 
@@ -209,26 +213,31 @@ void *productor(void *arg) {
  * @param arg del tipo `arg_hilo_consumidor *` contiene todos los argumentos necesarios para el hilo consumidor
  */
 void *consumidor(void *arg) {
-  arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)arg;
+  arg_hilo_consumidor *argumentos_hilo_consumidor = (arg_hilo_consumidor *)arg;
   celda_buffer_t dato;
-  long suma = 0;
-  bool parada = false;
+  int suma = 0;
 
-  nodo_lista **nodo = arg_c->nodo;
+  unsigned short id_hilo = argumentos_hilo_consumidor->id_hilo;
+  unsigned short *indice_consumidor = argumentos_hilo_consumidor->indice_consumidor;
+  unsigned short tamano_buffer = argumentos_hilo_consumidor->tamano_buffer;
+
+  unsigned short parada = 0;
+
+  nodo_lista **nodo = argumentos_hilo_consumidor->nodo;
 
   while (!parada) {
     sem_wait(&hay_dato);
     sem_wait(&mutex_buffer);
 
-    dato = buffer[*(arg_c->indice_consumidor)];
+    dato = buffer[*(indice_consumidor)];
     if (dato.longitud != 255) {
       if (dato.cadena[0] != '1' && dato.longitud == 32) {
 
-        if ((dato.cadena[dato.longitud - 1] == '0' && arg_c->id_hilo % 2 == 0) || (dato.cadena[dato.longitud - 1] == '1' && arg_c->id_hilo % 2 == 1)) {
+        if ((dato.cadena[dato.longitud - 1] == '0' && id_hilo % 2 == 0) || (dato.cadena[dato.longitud - 1] == '1' && id_hilo % 2 == 1)) {
 
           suma = (suma + atobtoi(dato.cadena)) % (RAND_MAX / 2);
 
-          *(arg_c->indice_consumidor) = (*(arg_c->indice_consumidor) + 1) % arg_c->tamano_buffer;
+          *(indice_consumidor) = (*(indice_consumidor) + 1) % tamano_buffer;
           sem_post(&hay_espacio);
 
         } else {
@@ -236,17 +245,17 @@ void *consumidor(void *arg) {
         }
 
       } else {
-        *(arg_c->indice_consumidor) = (*(arg_c->indice_consumidor) + 1) % arg_c->tamano_buffer;
+        *(indice_consumidor) = (*(indice_consumidor) + 1) % tamano_buffer;
         sem_post(&hay_espacio);
       }
     } else {
       sem_post(&hay_dato);
-      parada = true;
+      parada = 1;
     }
     sem_post(&mutex_buffer);
   }
   sem_wait(&mutex_lista_enlazada);
-  (*nodo)->id = arg_c->id_hilo;
+  (*nodo)->id = id_hilo;
   (*nodo)->suma_parcial_truncada = suma;
   *nodo = (*nodo)->siguiente_nodo;
   sem_post(&hay_suma);
@@ -254,21 +263,40 @@ void *consumidor(void *arg) {
   pthread_exit(NULL);
 }
 
+/**
+ * Funcion de los hilos consumidores, se encarga de leer del buffer,
+ * comprobar que el numero binario leido no sea negativo (el primer bit distinto de 1),
+ * que la longitud de la cadena sea exactamente 32, informando a traves de los semaforos
+ * que hay un hueco mas en el buffer y un dato menos
+ *
+ * Solo consume el dato si:
+ * - el numero sea par (termine en 0) y el id del hilo sea par
+ * - el numero sea impar (termine en 1) y el id del hilo sea impar
+ *
+ * en caso contrario no lo consume ni mueve el indice de acceso
+ *
+ * Este bucle ocurre hasta que se encuentra con una cadena de longitud igual a 255 (situacion imposible que genera el hilo productor al acabar de leer todos los datos)
+ * para marcar que ya no hay mas datos que leer y que ese hilo consumidor pueda finalizar
+ *
+ * A continuacion el hilo consumidor almacena su suma truncada en en nodo correspondiente de la lista enlazada
+ *
+ * @param arg del tipo `arg_hilo_sumador *` contiene todos los argumentos necesarios para el hilo consumidor
+ */
 void *sumador(void *arg) {
-  arg_hilo_sumador *arg_s = (arg_hilo_sumador *)arg;
+  arg_hilo_sumador *argumentos_hilo_sumador = (arg_hilo_sumador *)arg;
 
-  nodo_lista *nodo = arg_s->nodo;
-  long suma_total_truncada = 0;
+  nodo_lista *nodo = argumentos_hilo_sumador->nodo;
+  int suma_total_truncada = 0;
 
   while (nodo != NULL) {
     sem_wait(&hay_suma);
 
-    fprintf(arg_s->arc_resultados, "Hilo %d | Suma parcial: %d\n", nodo->id, nodo->suma_parcial_truncada);
+    fprintf(argumentos_hilo_sumador->arc_resultados, "Hilo %d | Suma parcial: %d\n", nodo->id, nodo->suma_parcial_truncada);
     suma_total_truncada = (suma_total_truncada + nodo->suma_parcial_truncada) % (RAND_MAX / 2);
     nodo = nodo->siguiente_nodo;
   }
 
-  fprintf(arg_s->arc_resultados, "Suma total: %d\n", suma_total_truncada);
+  fprintf(argumentos_hilo_sumador->arc_resultados, "Suma total: %d\n", suma_total_truncada);
 
   pthread_exit(NULL);
 }
@@ -278,17 +306,17 @@ void *sumador(void *arg) {
  *
  * @param cadena puntero al inicio de la cadena donde esta el string
  *
- * @return true si la cadena esta unicamente compuesta por numeros
+ * @return 1 si la cadena esta unicamente compuesta por numeros
  */
-bool es_numero(char *cadena) {
+unsigned char es_numero(char *cadena) {
   for (int i = 0; i < strlen(cadena); i++) {
 
     if (cadena[i] > '9' || cadena[i] < '0') {
-      return false;
+      return 0;
     }
   }
 
-  return true;
+  return 1;
 }
 
 /**

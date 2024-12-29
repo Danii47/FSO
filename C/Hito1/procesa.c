@@ -2,7 +2,6 @@
  * @author Hugo Adan de la Fuente y Daniel Fernandez Varona
  */
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,23 +10,23 @@
  *
  * @param cadena puntero al inicio de la cadena donde esta el string
  *
- * @return true si la cadena esta unicamente compuesta por numeros
+ * @return 1 si la cadena esta unicamente compuesta por numeros
  */
-bool es_numerico(char *cadena) {
+unsigned char es_numerico(char *cadena) {
 
   if (cadena[0] == '\n')
-    return false;
+    return 0;
 
   int i = 0;
 
   while (cadena[i] != '\n' && cadena[i] != '\0') {
     if (cadena[i] > '9' || cadena[i] < '0') {
-      return false;
+      return 0;
     }
     i++;
   }
 
-  return true;
+  return 1;
 }
 
 /**
