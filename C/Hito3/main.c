@@ -134,7 +134,7 @@ unsigned char es_binario(char *cadena) {
  *
  * @return numero entero correspondiente a la conversion
  */
-int atobtoi(char *cadena) {
+int atobintoi(char *cadena) {
   int n = 0;
 
   for (int i = 0; i < strlen(cadena); i++) {
@@ -159,20 +159,27 @@ int atobtoi(char *cadena) {
  */
 void *productor(void *arg) {
   arg_hilo_productor *argumentos_hilo_productor = (arg_hilo_productor *)arg;
+  
   char *cadena = NULL;
+  
   int indice_productor = 0;
   unsigned int tamano_cadena;
 
   unsigned short tamano_buffer = argumentos_hilo_productor->tamano_buffer;
+  FILE *fichero_abierto = argumentos_hilo_productor->fichero_abierto;
 
   size_t tam_buffer_cadena;
   celda_buffer_t dato;
 
-  while (getline(&cadena, &tam_buffer_cadena, argumentos_hilo_productor->fichero_abierto) != -1) {
-    cadena[strlen(cadena) - 1] = (cadena[strlen(cadena) - 1] == '\n') ? '\0' : cadena[strlen(cadena) - 1];
+  while (getline(&cadena, &tam_buffer_cadena, fichero_abierto) != -1) {
+    
+    if (cadena[strlen(cadena) - 1] == '\n') {
+      cadena[strlen(cadena) - 1] = '\0';
+    }
+
     tamano_cadena = strlen(cadena);
 
-    if (tamano_cadena <= 32 && tamano_cadena >= 1 && es_binario(cadena)) {
+    if (tamano_cadena >= 1 && tamano_cadena <= 32 && es_binario(cadena)) {
       sem_wait(&hay_espacio);
 
       strcpy(dato.cadena, cadena);
@@ -235,7 +242,7 @@ void *consumidor(void *arg) {
 
         if ((dato.cadena[dato.longitud - 1] == '0' && id_hilo % 2 == 0) || (dato.cadena[dato.longitud - 1] == '1' && id_hilo % 2 == 1)) {
 
-          suma = (suma + atobtoi(dato.cadena)) % (RAND_MAX / 2);
+          suma = (suma + atobintoi(dato.cadena)) % (RAND_MAX / 2);
 
           *(indice_consumidor) = (*(indice_consumidor) + 1) % tamano_buffer;
           sem_post(&hay_espacio);
@@ -298,7 +305,7 @@ void *sumador(void *arg) {
  *
  * @return 1 si la cadena esta unicamente compuesta por numeros
  */
-unsigned char es_numero(char *cadena) {
+unsigned char todo_numeros(char *cadena) {
   for (int i = 0; i < strlen(cadena); i++) {
 
     if (cadena[i] > '9' || cadena[i] < '0') {
@@ -391,7 +398,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *hilos = argv[3];
-  if (!es_numero(hilos)) {
+  if (!todo_numeros(hilos)) {
     fprintf(stderr, "El parametro de hilos no es numerico.\n");
     fclose(fichero_entrada_procesa);
     exit(EXIT_FAILURE);
@@ -406,7 +413,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *string_tamano_buffer = argv[4];
-  if (!es_numero(string_tamano_buffer)) {
+  if (!todo_numeros(string_tamano_buffer)) {
     fprintf(stderr, "El parametro de tamano de buffer no es numerico.\n");
     fclose(fichero_entrada_procesa);
     exit(EXIT_FAILURE);

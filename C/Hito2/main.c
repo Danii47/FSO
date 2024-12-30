@@ -97,7 +97,7 @@ bool es_binario(char *cadena) {
  *
  * @return numero entero correspondiente a la conversion
  */
-int atobtoi(char *cadena) {
+int atobintoi(char *cadena) {
   int n = 0;
 
   for (int i = 0; i < strlen(cadena); i++) {
@@ -121,23 +121,33 @@ int atobtoi(char *cadena) {
  * @param arg del tipo `arg_hilo_productor *` contiene todos los argumentos necesarios para el hilo productor
  */
 void *productor(void *arg) {
-  arg_hilo_productor *arg_p = (arg_hilo_productor *)arg;
+  arg_hilo_productor *argumentos_hilo_productor = (arg_hilo_productor *)arg;
+
   char *cadena = NULL;
+  
   int indice_productor = 0;
+  unsigned int tamano_cadena;
+
+  unsigned short tamano_buffer = argumentos_hilo_productor->tamano_buffer;
+  FILE *fichero_abierto = fichero_abierto;
+
   size_t tam_buffer_cadena;
-  int tam_cadena;
   celda_buffer_t dato;
-  while (getline(&cadena, &tam_buffer_cadena, arg_p->fichero_abierto) != -1) {
+  
+  while (getline(&cadena, &tam_buffer_cadena, fichero_abierto) != -1) {
 
-    cadena[strlen(cadena) - 1] = (cadena[strlen(cadena) - 1] == '\n') ? '\0' : cadena[strlen(cadena) - 1];
-    tam_cadena = strlen(cadena);
+    if (cadena[strlen(cadena) - 1] == '\n') {
+      cadena[strlen(cadena) - 1] = '\0';
+    }
+    
+    tamano_cadena = strlen(cadena);
 
-    if (tam_cadena <= 32 && tam_cadena >= 1 && es_binario(cadena)) {
+    if (tamano_cadena >= 1 && tamano_cadena <= 32 && es_binario(cadena)) {
       sem_wait(&hay_espacio);
       strcpy(dato.cadena, cadena);
-      dato.longitud = tam_cadena;
+      dato.longitud = tamano_cadena;
       buffer[indice_productor] = dato;
-      indice_productor = (indice_productor + 1) % arg_p->tamano_buffer;
+      indice_productor = (indice_productor + 1) % tamano_buffer;
 
       sem_post(&hay_dato);
     }
@@ -164,27 +174,33 @@ void *productor(void *arg) {
  * @param arg del tipo `arg_hilo_consumidor *` contiene todos los argumentos necesarios para el hilo consumidor
  */
 void *consumidor(void *arg) {
-  arg_hilo_consumidor *arg_c = (arg_hilo_consumidor *)arg;
+
+  arg_hilo_consumidor *argumentos_hilo_consumidor = (arg_hilo_consumidor *)arg;
   celda_buffer_t dato;
+
+  unsigned short* indice_consumidor = argumentos_hilo_consumidor->indice_consumidor;
+  unsigned short tamano_buffer = argumentos_hilo_consumidor->tamano_buffer;
+
   int suma = 0;
-  bool parada = false;
+  unsigned char parada = 0;
+
   while (!parada) {
     sem_wait(&hay_dato);
     sem_wait(&mutex_buffer);
-    dato = buffer[*(arg_c->indice_consumidor)];
+    dato = buffer[*(indice_consumidor)];
     if (dato.longitud != 255) {
-      if (dato.cadena[0] != '1' && dato.longitud == 32) {
-        suma = (suma + atobtoi(dato.cadena)) % (RAND_MAX / 2);
+      if (dato.cadena[0] == '0' && dato.longitud == 32) {
+        suma = (suma + atobintoi(dato.cadena)) % (RAND_MAX / 2);
       }
-      *(arg_c->indice_consumidor) = (*(arg_c->indice_consumidor) + 1) % arg_c->tamano_buffer;
+      *(indice_consumidor) = (*(indice_consumidor) + 1) % tamano_buffer;
       sem_post(&hay_espacio);
     } else {
       sem_post(&hay_dato);
-      parada = true;
+      parada = 1;
     }
     sem_post(&mutex_buffer);
   }
-  *(arg_c->resultado) = suma;
+  *(argumentos_hilo_consumidor->resultado) = suma;
   pthread_exit(NULL);
 }
 
@@ -195,15 +211,15 @@ void *consumidor(void *arg) {
  *
  * @return true si la cadena esta unicamente compuesta por numeros
  */
-bool es_numero(char *cadena) {
+unsigned char todo_numeros(char *cadena) {
   for (int i = 0; i < strlen(cadena); i++) {
 
     if (cadena[i] > '9' || cadena[i] < '0') {
-      return false;
+      return 0;
     }
   }
 
-  return true;
+  return 1;
 }
 
 /**
@@ -247,7 +263,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *hilos = argv[3];
-  if (!es_numero(hilos)) {
+  if (!todo_numeros(hilos)) {
     fprintf(stderr, "El parametro de hilos no es numerico.\n");
     fclose(fichero_entrada_procesa);
     return EXIT_FAILURE;
@@ -262,7 +278,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *string_tamano_buffer = argv[4];
-  if (!es_numero(string_tamano_buffer)) {
+  if (!todo_numeros(string_tamano_buffer)) {
     fprintf(stderr, "El parametro de tamano de buffer no es numerico.\n");
     fclose(fichero_entrada_procesa);
     return EXIT_FAILURE;
