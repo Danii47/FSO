@@ -23,6 +23,7 @@ unsigned char es_numerico(char *cadena) {
     if (cadena[i] > '9' || cadena[i] < '0') {
       return 0;
     }
+    
     i++;
   }
 
@@ -70,9 +71,9 @@ int main(int argc, char *argv[]) {
 
   char cadena_leida;
   char *puntero_cadena_leida = &cadena_leida;
-  size_t tam;
+  size_t tamano;
 
-  while (getline(&puntero_cadena_leida, &tam, fichero_entrada_procesa) != -1) {
+  while (getline(&puntero_cadena_leida, &tamano, fichero_entrada_procesa) != -1) {
     if (es_numerico(puntero_cadena_leida)) {
       fprintf(fichero_salida_procesa, "%s", puntero_cadena_leida);
     }
