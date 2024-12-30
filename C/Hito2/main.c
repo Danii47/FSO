@@ -382,11 +382,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Asignacion argumentos hilos consumidores
-    unsigned short _ = 0;
+    unsigned short indice_acceso = 0;
     for (unsigned short i = 0; i < numero_hilos; i++) {
       argumentos_consumidores[i].tamano_buffer = tamano_buffer;
       argumentos_consumidores[i].resultado = &array_resultados[i];
-      argumentos_consumidores[i].indice_consumidor = &_;
+      argumentos_consumidores[i].indice_consumidor = &indice_acceso;
     }
     //
 

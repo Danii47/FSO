@@ -344,7 +344,7 @@ nodo_lista *crear_nodos(unsigned short numero_nodos) {
       exit(EXIT_FAILURE);
     }
 
-    nuevo_nodo->id = i;
+    nuevo_nodo->id = 0;
     nuevo_nodo->suma_parcial_truncada = 0;
     nuevo_nodo->siguiente_nodo = NULL;
 
@@ -517,11 +517,11 @@ int main(int argc, char *argv[]) {
     nodo_lista *nodo_inicial_consumidor = nodo_inicial;
 
     // Asignacion argumentos hilos consumidores
-    unsigned short _ = 0;
+    unsigned short indice_acceso = 0;
     for (unsigned short i = 0; i < numero_hilos; i++) {
       argumentos_consumidores[i].tamano_buffer = tamano_buffer;
       argumentos_consumidores[i].nodo = &nodo_inicial_consumidor;
-      argumentos_consumidores[i].indice_consumidor = &_;
+      argumentos_consumidores[i].indice_consumidor = &indice_acceso;
       argumentos_consumidores[i].id_hilo = i;
     }
     //
