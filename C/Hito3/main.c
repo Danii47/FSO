@@ -208,7 +208,7 @@ void *productor(void *arg) {
  * Este bucle ocurre hasta que se encuentra con una cadena de longitud igual a 255 (situacion imposible que genera el hilo productor al acabar de leer todos los datos)
  * para marcar que ya no hay mas datos que leer y que ese hilo consumidor pueda finalizar
  *
- * A continuacion el hilo consumidor almacena su suma truncada en en nodo correspondiente de la lista enlazada
+ * A continuacion el hilo consumidor almacena su suma truncada en nodo correspondiente de la lista enlazada
  *
  * @param arg del tipo `arg_hilo_consumidor *` contiene todos los argumentos necesarios para el hilo consumidor
  */
@@ -264,23 +264,13 @@ void *consumidor(void *arg) {
 }
 
 /**
- * Funcion de los hilos consumidores, se encarga de leer del buffer,
- * comprobar que el numero binario leido no sea negativo (el primer bit distinto de 1),
- * que la longitud de la cadena sea exactamente 32, informando a traves de los semaforos
- * que hay un hueco mas en el buffer y un dato menos
+ * Funcion de los hilos sumadores, se encarga de leer de la lista dinamica
  *
- * Solo consume el dato si:
- * - el numero sea par (termine en 0) y el id del hilo sea par
- * - el numero sea impar (termine en 1) y el id del hilo sea impar
+ * Este bucle ocurre hasta que se encuentra con un nodo que vale NULL, eso significa que ya habran acabado todos los hilos
  *
- * en caso contrario no lo consume ni mueve el indice de acceso
+ * A continuacion el hilo sumador guarda la suma total truncada en el fichero de resultados
  *
- * Este bucle ocurre hasta que se encuentra con una cadena de longitud igual a 255 (situacion imposible que genera el hilo productor al acabar de leer todos los datos)
- * para marcar que ya no hay mas datos que leer y que ese hilo consumidor pueda finalizar
- *
- * A continuacion el hilo consumidor almacena su suma truncada en en nodo correspondiente de la lista enlazada
- *
- * @param arg del tipo `arg_hilo_sumador *` contiene todos los argumentos necesarios para el hilo consumidor
+ * @param arg del tipo `arg_hilo_sumador *` contiene todos los argumentos necesarios para el hilo sumador
  */
 void *sumador(void *arg) {
   arg_hilo_sumador *argumentos_hilo_sumador = (arg_hilo_sumador *)arg;

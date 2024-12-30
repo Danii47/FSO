@@ -283,8 +283,8 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
 
   } else if (id_proceso == 0) {
-    char *ruta_proceso = "./procesa.out";
-    char *comando = "./procesa.out";
+    char *ruta_proceso = "./procesa";
+    char *comando = "./procesa";
     char *argumento_1 = argv[1];
     char *argumento_2 = argv[2];
 
