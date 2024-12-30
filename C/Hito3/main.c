@@ -240,7 +240,7 @@ void *consumidor(void *arg) {
     if (dato.longitud != 255) {
       if (dato.cadena[0] != '1' && dato.longitud == 32) {
 
-        if ((dato.cadena[dato.longitud - 1] == '0' && id_hilo % 2 == 0) || (dato.cadena[dato.longitud - 1] == '1' && id_hilo % 2 == 1)) {
+        if ((dato.cadena[dato.longitud - 1] == '1' && id_hilo % 2 == 1) || (dato.cadena[dato.longitud - 1] == '0' && id_hilo % 2 == 0)) {
 
           suma = (suma + atobintoi(dato.cadena)) % (RAND_MAX / 2);
 
