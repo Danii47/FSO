@@ -110,6 +110,24 @@ int atobintoi(char *cadena) {
 }
 
 /**
+ * Funcion que comprueba si una cadena de caracteres esta compuesta unicamente por numeros
+ *
+ * @param cadena puntero al inicio de la cadena donde esta el string
+ *
+ * @return true si la cadena esta unicamente compuesta por numeros
+ */
+unsigned char todo_numeros(char *cadena) {
+  for (int i = 0; i < strlen(cadena); i++) {
+
+    if (cadena[i] > '9' || cadena[i] < '0') {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+/**
  * Funcion del hilo productor, se encarga de leer un fichero,
  * comprobar que la longitud de la linea esta en el intervalo [1, 32] (excluyendo el salto de linea),
  * que el numero sea binario y lo almacena en el buffer circular, informando a traves de los semaforos
@@ -144,9 +162,12 @@ void *productor(void *arg) {
 
     if (tamano_cadena >= 1 && tamano_cadena <= 32 && es_binario(cadena)) {
       sem_wait(&hay_espacio);
+
       strcpy(dato.cadena, cadena);
       dato.longitud = tamano_cadena;
+
       buffer[indice_productor] = dato;
+
       indice_productor = (indice_productor + 1) % tamano_buffer;
 
       sem_post(&hay_dato);
@@ -202,24 +223,6 @@ void *consumidor(void *arg) {
   }
   *(argumentos_hilo_consumidor->resultado) = suma;
   pthread_exit(NULL);
-}
-
-/**
- * Funcion que comprueba si una cadena de caracteres esta compuesta unicamente por numeros
- *
- * @param cadena puntero al inicio de la cadena donde esta el string
- *
- * @return true si la cadena esta unicamente compuesta por numeros
- */
-unsigned char todo_numeros(char *cadena) {
-  for (int i = 0; i < strlen(cadena); i++) {
-
-    if (cadena[i] > '9' || cadena[i] < '0') {
-      return 0;
-    }
-  }
-
-  return 1;
 }
 
 /**
