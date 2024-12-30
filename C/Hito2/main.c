@@ -147,17 +147,17 @@ void *productor(void *arg) {
   unsigned int tamano_cadena;
 
   unsigned short tamano_buffer = argumentos_hilo_productor->tamano_buffer;
-  FILE *fichero_abierto = fichero_abierto;
+  FILE *fichero_abierto = argumentos_hilo_productor->fichero_abierto;
 
   size_t tam_buffer_cadena;
   celda_buffer_t dato;
-  
+
   while (getline(&cadena, &tam_buffer_cadena, fichero_abierto) != -1) {
 
     if (cadena[strlen(cadena) - 1] == '\n') {
       cadena[strlen(cadena) - 1] = '\0';
     }
-    
+
     tamano_cadena = strlen(cadena);
 
     if (tamano_cadena >= 1 && tamano_cadena <= 32 && es_binario(cadena)) {
@@ -415,7 +415,7 @@ int main(int argc, char *argv[]) {
     for (unsigned short i = 0; i < numero_hilos; i++) {
       suma = (suma + array_resultados[i]) % (RAND_MAX / 2);
     }
-    printf("Suma total truncada: %ld\n", suma);
+    printf("Suma total truncada: %d\n", suma);
     //
 
     // Destruccion de semaforos
