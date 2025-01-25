@@ -36,6 +36,20 @@ bool isNumber(char* str) {
 }
 
 int main(int argc, char** argv) {
+
+  int array[10][10];
+
+  // Martiz 2 filas | primera fila -> 6 elementos y la segunda 10 elementos
+
+  int** matriz = (int**) malloc(sizeof(int*) * 2);
+
+  matriz[0] = (int*) malloc(sizeof(int) * 6);
+  matriz[1] = (int*) malloc(sizeof(int) * 10);
+
+  matriz[0][3] = 10;
+
+
+
   if (argc != 4) {
     fprintf(stderr, "ERROR: El número de argumentos es incorrecto.\n");
     exit(-1);
